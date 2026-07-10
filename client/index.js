@@ -1,9 +1,8 @@
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
+const router = require("express").Router();
+const path = require("path");
 
-const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
-const test = dom.window.document.createElement("div");
-dom.window.document.body.appendChild(test);
-test.textContent = "Testing jsdom.";
+router.route("/").get((req, res) => {
+    res.sendfile(path.join(__dirname, "index.html"));
+});
 
-module.exports = dom.window.document.body.innerHTML;
+module.exports = router;

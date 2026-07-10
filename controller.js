@@ -1,5 +1,4 @@
-const express = require("express");
-const router = express.Router();
+const router = require("express").Router();
 const fs = require("fs");
 const path = require("path");
 const root = path.dirname(require.main.filename);
@@ -13,12 +12,23 @@ router.use((req, res, next) => {
 //Send all requests through all middleware.
 router.use(require("./middleware"));
 
-router.use("/", (req, res) => {
-    res.send(require("./client"));
-});
-
 //Handle api requests
 router.use("/api/v1", require("./routes"));
+
+router.use("/", require("./client"));
+
+//Handle DOM requests
+router.use(/\/.*/, (req, res, next) => {
+    const filePath =
+        req.originalUrl === "/"
+            ? path.join(root, "build/index.html")
+            : path.join(root, "build", req.originalUrl);
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        next(); //Send the 404 error.
+    }
+});
 
 //If they made it this far, it's time for that 404.
 router.use((req, res, next) => {
